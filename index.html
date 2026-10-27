@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>m³ / m² Preisrechner</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#152033;--muted:#64748b;--accent:#2563eb;--line:#dbe3ef}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(135deg,#eef4ff,#f8fafc);color:var(--ink)}
+.wrap{max-width:980px;margin:auto;padding:28px 18px}.card{background:var(--card);border-radius:22px;padding:24px;box-shadow:0 14px 40px #1e293b18;margin-bottom:18px}h1{margin:0 0 6px}p{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}label{font-weight:650;font-size:.92rem}input{width:100%;margin-top:6px;padding:13px;border:1px solid var(--line);border-radius:12px;font-size:1rem}
+.results{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.result{background:#f8fafc;border:1px solid var(--line);border-radius:15px;padding:15px}.value{font-size:1.55rem;font-weight:800;color:var(--accent)}
+.stage{height:290px;display:grid;place-items:center;perspective:700px;overflow:hidden}.box{width:150px;height:120px;position:relative;transform-style:preserve-3d;transform:rotateX(-22deg) rotateY(32deg);transition:.25s}.face{position:absolute;border:2px solid #1d4ed8aa;background:#3b82f68c;display:grid;place-items:center;color:white;font-weight:800;text-shadow:0 1px 3px #0008}.front,.back{width:100%;height:100%}.front{transform:translateZ(var(--d))}.back{transform:rotateY(180deg) translateZ(var(--d))}.left,.right{width:calc(var(--d)*2);height:100%;left:50%;margin-left:calc(var(--d)*-1)}.left{transform:rotateY(-90deg) translateZ(calc(var(--w)/2))}.right{transform:rotateY(90deg) translateZ(calc(var(--w)/2))}.top,.bottom{width:100%;height:calc(var(--d)*2);top:50%;margin-top:calc(var(--d)*-1)}.top{transform:rotateX(90deg) translateZ(calc(var(--h)/2))}.bottom{transform:rotateX(-90deg) translateZ(calc(var(--h)/2))}
+.note{font-size:.86rem}@media(max-width:650px){.grid,.results{grid-template-columns:1fr}.wrap{padding:14px}.card{padding:18px}}
+</style>
+</head>
+<body><main class="wrap">
+<div class="card"><h1>m³ / m² Preisrechner</h1><p>Maße eingeben und Volumen, Flächen sowie Kosten sofort berechnen.</p>
+<div class="grid">
+<div><label>Länge (m)<input id="l" type="number" min="0" step="any" value="2"></label></div>
+<div><label>Breite (m)<input id="b" type="number" min="0" step="any" value="1.5"></label></div>
+<div><label>Höhe (m)<input id="h" type="number" min="0" step="any" value="1"></label></div>
+<div><label>Preis pro m³ (€)<input id="pm3" type="number" min="0" step="any" value="100"></label></div>
+<div><label>Preis pro m² (€)<input id="pm2" type="number" min="0" step="any" value="25"></label></div>
+</div></div>
+<div class="card"><h2>Visualisierung</h2><div class="stage"><div class="box" id="box"><div class="face front">Vorne</div><div class="face back"></div><div class="face left"></div><div class="face right">Seite</div><div class="face top">Oben</div><div class="face bottom"></div></div></div><p class="note">Der Quader passt seine Proportionen an Länge, Breite und Höhe an.</p></div>
+<div class="card"><h2>Ergebnisse</h2><div class="results">
+<div class="result">Volumen<div class="value" id="vol">–</div></div>
+<div class="result">Grundfläche (L × B)<div class="value" id="base">–</div></div>
+<div class="result">Gesamtoberfläche<div class="value" id="surface">–</div></div>
+<div class="result">Preis nach m³<div class="value" id="cost3">–</div></div>
+<div class="result">Preis nach m², Grundfläche<div class="value" id="cost2base">–</div></div>
+<div class="result">Preis nach m², Gesamtoberfläche<div class="value" id="cost2surf">–</div></div>
+</div><p class="note">m³ und m² sind unterschiedliche Größen. Deshalb zeigt der Rechner sowohl die Grundfläche als auch die gesamte Oberfläche des Quaders.</p></div>
+</main>
+<script>
+const ids=['l','b','h','pm3','pm2']; const $=id=>document.getElementById(id); const n=id=>Math.max(0,Number($(id).value)||0); const nf=new Intl.NumberFormat('de-DE',{maximumFractionDigits:3}); const eur=new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'});
+function calc(){const l=n('l'),b=n('b'),h=n('h'),p3=n('pm3'),p2=n('pm2');const vol=l*b*h,base=l*b,surf=2*(l*b+l*h+b*h);$('vol').textContent=nf.format(vol)+' m³';$('base').textContent=nf.format(base)+' m²';$('surface').textContent=nf.format(surf)+' m²';$('cost3').textContent=eur.format(vol*p3);$('cost2base').textContent=eur.format(base*p2);$('cost2surf').textContent=eur.format(surf*p2);
+const max=Math.max(l,b,h,0.001), w=60+110*l/max, d=25+45*b/max, hh=60+110*h/max; const box=$('box'); box.style.width=w+'px';box.style.height=hh+'px';box.style.setProperty('--w',w+'px');box.style.setProperty('--h',hh+'px');box.style.setProperty('--d',d+'px');}
+ids.forEach(id=>$(id).addEventListener('input',calc));calc();
+</script></body></html>
